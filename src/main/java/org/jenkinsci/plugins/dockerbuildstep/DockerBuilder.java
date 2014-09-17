@@ -65,6 +65,7 @@ public class DockerBuilder extends Builder {
         try {
             DockerCmdCallable callable = new DockerCmdCallable(dockerCmd, build, clog);
             launcher.getChannel().call(callable);
+			LOGGER.info("Failed to execute Docker command " + dockerCmd.getDescriptor().getDisplayName() + ": ");
         } catch (DockerException e) {
             clog.logError("command '" + dockerCmd.getDescriptor().getDisplayName() + "' failed: " + e.getMessage());
             LOGGER.severe("Failed to execute Docker command " + dockerCmd.getDescriptor().getDisplayName() + ": "

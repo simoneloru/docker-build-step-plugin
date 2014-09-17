@@ -18,8 +18,18 @@ import org.kohsuke.stapler.QueryParameter;
 
 import com.github.dockerjava.client.DockerClient;
 import com.github.dockerjava.client.DockerException;
+import com.github.dockerjava.client.command.StartContainerCmd;
 import com.github.dockerjava.client.model.ContainerInspectResponse;
 import com.github.dockerjava.client.model.Ports;
+import hudson.EnvVars;
+import hudson.model.ParameterValue;
+import hudson.model.ParametersAction;
+import hudson.model.StringParameterValue;
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.commons.io.FileUtils;
 
 /**
  * This command starts one or more Docker containers. It also exports some build environment variable like IP or started
@@ -74,7 +84,7 @@ public class StartCommand extends DockerCommand {
         if (containerIds == null || containerIds.isEmpty()) {
             throw new IllegalArgumentException("At least one parameter is required");
         }
-
+		
         // expand build and env. variable
         String containerIdsRes = Resolver.buildVar(build, containerIds);
         String portBindingsRes = Resolver.buildVar(build, portBindings);
@@ -84,13 +94,30 @@ public class StartCommand extends DockerCommand {
         DockerClient client = getClient();
 
         // TODO check, if container exists and is stopped (probably catch exception)
-        for (String id : ids) {
+		EnvVars environment = null;
+		try {
+			environment = build.getEnvironment(console.getListener());
+		} catch (Exception ex) {
+			Logger.getLogger(StartCommand.class.getName()).log(Level.SEVERE, null, ex);
+			throw new DockerException("Cannot read env variables");
+		} 
+
+		for (String id : ids) {
             id = id.trim();
-            client.execute(client.startContainerCmd(id)
-                    .withPublishAllPorts(publishAllPorts)
-                    .withPortBindings(bindPorts)
-                    .withPrivileged(privileged));
+			StartContainerCmd clientStartContainerCmd = client.startContainerCmd(id)
+					.withPublishAllPorts(publishAllPorts)
+					.withPortBindings(bindPorts)
+					.withPrivileged(privileged);
+            client.execute(clientStartContainerCmd);
             console.logInfo("started container id " + id);
+            console.logInfo("privileged " + privileged);
+			try {
+				File idFile = new File(environment.get("PWD") + File.separator + "docker" + File.separator +"run"+ File.separator + environment.get("JOB_NAME") + File.separator + environment.get("GIT_BRANCH") + File.separator + id);
+				FileUtils.touch(idFile);
+			} catch (IOException ex) {
+				Logger.getLogger(StartCommand.class.getName()).log(Level.SEVERE, null, ex);
+				throw new DockerException("error writing file", ex.getCause());
+			}
 
             ContainerInspectResponse inspectResp = client.execute(client.inspectContainerCmd(id));
             EnvInvisibleAction envAction = new EnvInvisibleAction(inspectResp);
