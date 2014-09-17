@@ -27,7 +27,6 @@ public class DockerEnvContributor extends EnvironmentContributor {
 
     public final String ID_SEPARATOR = ",";
     public final String CONTAINER_IDS_ENV_VAR = "DOCKER_CONTAINER_IDS";
-    public final String RUNNING_ENV_VAR = "RUNNING";
     public final String CONTAINER_IP_PREFIX = "DOCKER_IP_";
     public final String PORT_BINDINGS_ENV_VAR = "DOCKER_HOST_BIND_PORTS";
     public final String PORT_BINDING_PREFIX = "DOCKER_HOST_PORT_";
@@ -56,21 +55,6 @@ public class DockerEnvContributor extends EnvironmentContributor {
 
         containerIds = containerIds.substring(0, containerIds.length() - 1);
         envs.put(CONTAINER_IDS_ENV_VAR, containerIds);
-//		
-//		String runningIds = envs.get(RUNNING_ENV_VAR, "");
-//        if (!runningIds.equals("")) {
-//            runningIds.concat(ID_SEPARATOR);
-//        }
-//		for (EnvInvisibleAction action : envActions) {
-//            runningIds = runningIds.concat(action.getId()).concat(ID_SEPARATOR);
-//            envs.put(CONTAINER_IP_PREFIX + action.getHostName(), action.getIpAddress());
-//            if (action.hasPortBindings()) {
-//                exportPortBindings(envs, action.getPortBindings());
-//            }
-//        }
-//
-//        runningIds = runningIds.substring(0, runningIds.length() - 1);
-//        envs.put(RUNNING_ENV_VAR, runningIds);
 
     }
 
