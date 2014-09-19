@@ -10,5 +10,23 @@
     <f:entry field="hostName" title="Hostname">
         <f:textbox />
     </f:entry>
+	
+	<f:advanced align="left">
+		<f:entry field="portDbNameVar" title="Port DB var name" description="Insert the port db env name">
+			<f:textbox />
+		</f:entry>
+		
+		<f:entry field="portDbNameValue" title="Port DB var value" description="Insert the port db env var value">
+			<f:textbox />
+		</f:entry>
+		
+		<f:entry field="servDbNameVar" title="Serv DB var name" description="Insert the serv db env name">
+			<f:textbox />
+		</f:entry>
+		
+		<f:entry field="servDbNameValue" title="Serv DB var value" description="Insert the serv db env var value">
+			<f:textbox />
+		</f:entry>
+	</f:advanced>
     
 </j:jelly>
